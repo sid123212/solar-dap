@@ -10,8 +10,8 @@
 - [x] **Layer 2: Contemporaneous Baseline Modeling** — Random Forest regressor evaluated ($R^2 = 0.967$, MAE $23.64 \, \text{W/m}^2$) against mean baseline.
 - [x] **Layer 3: Frontend Shell & Overview Module (Milestones 1A & 1B)** — React + TypeScript + Vite application shell with dark theme, collapsible navigation, regional KPIs, 24-hour diurnal profile with DNI/DHI decomposition, multi-city comparison, and 7-day insolation trends.
 - [x] **Layer 4: Solar Resource Analytics Module (Milestone 2)** — Multi-series irradiance decomposition (GHI, DNI, DHI, GTI), 7-day chronological progression viewer, cloud opacity vs. GHI linear regression ($r = -0.530$, $R^2 = 0.281$), daylight correlation heatmap, and daily insolation summary table.
-- [ ] **Layer 5: Genuine 1-Hour-Ahead Forecasting (Milestone 3)** — $t+4$ horizon ML model benchmarked against persistence baseline.
-- [ ] **Layer 6: Anomaly Monitoring & API Integration (Milestones 4 & 5)** — Residual tracking, severity classification, and model serving.
+- [x] **Layer 5: Genuine 1-Hour-Ahead Forecasting (Milestone 3)** — $t+4$ horizon Random Forest model benchmarked against persistence baseline ($R^2 = 0.990$, MAE $10.60 \, \text{W/m}^2$, 81.2% MAE improvement).
+- [x] **Layer 6: Anomaly Monitoring & API Integration (Milestones 4 & 5)** — City-specific 99th-percentile residual anomaly monitoring, severity classification, FastAPI ML serving, and full frontend integration.
 
 ---
 
@@ -23,16 +23,20 @@ solar-dap/
 │   ├── app/
 │   │   ├── config.py               # Robust path resolution & city configurations
 │   │   ├── data_loader.py          # Solcast CSV loading, IST normalization & statistics
+│   │   ├── ml_loader.py            # ML artifacts loader, predictions & anomaly querying
 │   │   ├── schemas.py              # Pydantic schemas for API endpoints
 │   │   ├── main.py                 # FastAPI app & CORS middleware
 │   │   └── routers/
 │   │       ├── health.py           # /api/health
-│   │       └── analytics.py        # /api/analytics/cities, summary, timeseries
+│   │       ├── analytics.py        # /api/analytics/cities, summary, timeseries
+│   │       └── ml.py               # /api/ml/metrics, city-metrics, feature-importance, predictions, anomalies
 │   ├── requirements.txt
+│   ├── test_ml_endpoints.py        # Automated test suite for ML endpoints
 │   └── README.md
 ├── data/                           # Three original Solcast CSVs (Delhi, Raipur, Jaisalmer)
 ├── docs/
-│   └── project_context.md          # Project context, dataset specifics & specifications
+│   ├── project_context.md          # Project context, dataset specifics & specifications
+│   └── report_summary.md           # Comprehensive report-style technical project summary
 ├── frontend/                       # React + TypeScript + Vite + Tailwind CSS frontend
 │   ├── src/
 │   │   ├── components/

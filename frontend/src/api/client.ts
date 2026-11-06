@@ -19,6 +19,14 @@ const API_BASE_URL =
     : '';
 
 async function handleResponse<T>(res: Response): Promise<T> {
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('text/html')) {
+    throw new Error(
+      `Received HTML instead of JSON from ${res.url}. ` +
+      `If deployed on Vercel, ensure VITE_API_BASE_URL is set to your Render backend URL in Vercel Project Settings, then redeploy.`
+    );
+  }
+
   if (!res.ok) {
     let errorDetail = `HTTP ${res.status}: ${res.statusText}`;
     try {

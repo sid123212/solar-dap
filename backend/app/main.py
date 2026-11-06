@@ -40,6 +40,32 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
+# Fail-safe CORS middleware: guarantees CORS headers are present on all responses, including exceptions & errors
+@app.middleware("http")
+async def ensure_cors_headers(request, call_next):
+    origin = request.headers.get("origin", "*")
+    if request.method == "OPTIONS":
+        from fastapi.responses import Response
+        res = Response(content="OK", status_code=200)
+    else:
+        try:
+            res = await call_next(request)
+        except Exception as e:
+            from fastapi.responses import JSONResponse
+            res = JSONResponse(
+                status_code=500,
+                content={"detail": f"Internal Server Error: {str(e)}"}
+            )
+    
+    if origin and origin != "*":
+        res.headers["Access-Control-Allow-Origin"] = origin
+        res.headers["Access-Control-Allow-Credentials"] = "true"
+    else:
+        res.headers["Access-Control-Allow-Origin"] = "*"
+    res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    res.headers["Access-Control-Allow-Headers"] = "*"
+    return res
+
 # Mount API routers under /api
 app.include_router(health.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
@@ -84,13 +110,21 @@ def serve_spa(full_path: str = ""):
     if index_file.is_file():
         return FileResponse(str(index_file))
 
-    # Fallback if frontend is not built
+    # When deployed as a standalone API backend (e.g. Render with frontend on Vercel)
     return {
         "service": "SOLAR DAP Analytics API",
         "version": "0.1.0",
+        "status": "online",
         "documentation": "/docs",
         "health_check": "/api/health",
-        "status": "online",
-        "notice": "Frontend build not detected at frontend/dist. Run 'npm run build' in frontend directory to serve UI through FastAPI."
+        "endpoints": {
+            "cities": "/api/analytics/cities",
+            "summary": "/api/analytics/summary?location=Delhi",
+            "timeseries": "/api/analytics/timeseries?location=Delhi&start_date=2025-06-01&end_date=2025-06-07",
+            "ml_metrics": "/api/ml/metrics",
+            "city_metrics": "/api/ml/city-metrics",
+            "predictions": "/api/ml/predictions?location=Delhi",
+            "anomalies": "/api/ml/anomalies?location=Delhi"
+        }
     }
 

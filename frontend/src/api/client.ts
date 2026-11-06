@@ -10,7 +10,13 @@ import type {
   AnomaliesResponse
 } from './types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// Use environment variable if explicitly configured; otherwise default to relative path ''
+// Strips trailing slashes to prevent malformed double-slash URLs (e.g., https://api.onrender.com//api/health)
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = 
+  rawBaseUrl && typeof rawBaseUrl === 'string' && rawBaseUrl.trim() !== ''
+    ? rawBaseUrl.trim().replace(/\/+$/, '')
+    : '';
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {

@@ -14,7 +14,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
         <RefreshCw className="h-6 w-6" />
       </div>
       <p className="text-sm font-medium text-slate-200">{message}</p>
-      <p className="text-xs text-slate-400 mt-1">Calling FastAPI endpoints at localhost:8000</p>
+      <p className="text-xs text-slate-400 mt-1">Connecting to FastAPI analytics service (free tier cold starts may take ~30s)</p>
     </div>
   );
 };

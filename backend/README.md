@@ -29,16 +29,28 @@ pip install -r requirements.txt
 
 ## 3. Running the Server
 
-Start the Uvicorn ASGI development server:
-
+### Option 1: Unified Launcher (Serves Frontend UI + Backend API)
+From the project root:
 ```powershell
-python -m uvicorn app.main:app --reload --port 8000
+python run.py
+```
+
+### Option 2: Direct Uvicorn Command
+From this `backend/` directory:
+```powershell
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The server will be available at:
-- **API Base URL:** `http://localhost:8000`
+- **Web Dashboard:** `http://localhost:8000` (or `http://127.0.0.1:8000`)
+- **API Base URL:** `http://localhost:8000/api`
 - **Interactive OpenAPI Docs:** `http://localhost:8000/docs`
 - **Alternative Redoc:** `http://localhost:8000/redoc`
+
+### CORS & Proxy Support
+- When running through FastAPI on port 8000, the frontend and API share the exact same origin, guaranteeing zero CORS issues.
+- In development mode (Vite at `http://localhost:5173`), Vite's dev server proxies `/api` directly to `http://127.0.0.1:8000`.
+- FastAPI's `CORSMiddleware` is configured to allow all dev origins (`localhost`, `127.0.0.1`, `*`) with full method and header support.
 
 ---
 

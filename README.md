@@ -54,20 +54,40 @@ solar-dap/
 
 ## 3. Running the Project
 
-### A. Frontend (React + Vite)
-```bash
-cd frontend
-npm install
-npm run dev
+### A. Quickest Option: Unified FastAPI Runner (Zero CORS)
+Run the entire platform (both the React frontend UI and FastAPI REST backend) through FastAPI on a single port:
+```powershell
+python run.py
+```
+- **Unified Web Dashboard:** `http://localhost:8000` (or `http://127.0.0.1:8000`)
+- **Interactive Swagger Docs:** `http://localhost:8000/docs`
+- **Health Check:** `http://localhost:8000/api/health`
+
+*Note:* Because the frontend and backend are served together under the same origin, browser CORS restrictions are completely eliminated.
+
+---
+
+### B. Development Mode (Vite Dev Server + FastAPI with Proxy)
+If developing the frontend with instant hot-module replacement (HMR):
+
+1. **Option 1: One-command dual start**
+```powershell
+python run.py --dev
 ```
 
-### B. Backend (FastAPI)
-```powershell
-cd backend
-pip install -r requirements.txt
-python -m uvicorn app.main:app --reload --port 8000
-```
-Interactive API documentation: `http://localhost:8000/docs`
+2. **Option 2: Separate terminals**
+- **Terminal 1 (Backend):**
+  ```powershell
+  cd backend
+  python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  ```
+- **Terminal 2 (Frontend):**
+  ```powershell
+  cd frontend
+  npm run dev
+  ```
+- Vite dev server runs at `http://localhost:5173` and automatically proxies `/api` calls to `http://127.0.0.1:8000`.
+- FastAPI's robust CORS middleware also permits direct cross-origin requests from `localhost:5173`, `127.0.0.1:5173`, and all local dev ports.
 
 ---
 

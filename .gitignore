@@ -1,2 +1,7 @@
 
 ml/artifacts/forecast_model.joblib
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
